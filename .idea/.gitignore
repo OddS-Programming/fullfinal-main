@@ -1,0 +1,29 @@
+# IDE
+.idea/
+*.iml
+
+# Java / Maven
+target/
+out/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Env / local secrets
+.env
+.env.*
+!.env.example
+
+# Vite / temp
+frontend/.vite/
+
+# Coverage / reports
+coverage/

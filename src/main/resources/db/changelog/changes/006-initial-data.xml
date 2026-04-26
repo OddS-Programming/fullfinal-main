@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="006-initial-data" author="devops-panel">
+        <comment>Optional: admin user for testing (password: password)</comment>
+        <sql>
+            INSERT INTO users (username, email, password, role)
+            SELECT 'admin', 'admin@devops.local', '$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG', 'ADMIN'
+            WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
+        </sql>
+    </changeSet>
+</databaseChangeLog>
