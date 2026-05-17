@@ -66,6 +66,7 @@ public class ProjectService {
                 .name(request.getName())
                 .description(request.getDescription())
                 .publicProject(Boolean.TRUE.equals(request.getPublicProject()))
+                .gitRepositoryUrl(cleanUrl(request.getGitRepositoryUrl()))
                 .owner(owner)
                 .build();
         project = projectRepository.save(project);
@@ -85,6 +86,7 @@ public class ProjectService {
         project.setName(request.getName());
         project.setDescription(request.getDescription());
         project.setPublicProject(Boolean.TRUE.equals(request.getPublicProject()));
+        project.setGitRepositoryUrl(cleanUrl(request.getGitRepositoryUrl()));
         project = projectRepository.save(project);
         log.info("Project updated: id={}, name={}", project.getId(), project.getName());
         return toResponse(project);
@@ -109,9 +111,14 @@ public class ProjectService {
                 .name(p.getName())
                 .description(p.getDescription())
                 .publicProject(p.isPublicProject())
+                .gitRepositoryUrl(p.getGitRepositoryUrl())
                 .ownerId(p.getOwner().getId())
                 .ownerUsername(p.getOwner().getUsername())
                 .createdAt(p.getCreatedAt())
                 .build();
+    }
+
+    private String cleanUrl(String url) {
+        return url == null || url.isBlank() ? null : url.trim();
     }
 }

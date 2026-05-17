@@ -13,4 +13,5 @@
     <include file="db/changelog/changes/006-initial-data.xml"/>
     <include file="db/changelog/changes/007-add-description-to-environments-and-deployments.xml"/>
     <include file="db/changelog/changes/008-add-public-projects.xml"/>
+    <include file="db/changelog/changes/009-add-project-git-url.xml"/>
 </databaseChangeLog>

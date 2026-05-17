@@ -32,6 +32,9 @@ public class Project {
     @Builder.Default
     private boolean publicProject = false;
 
+    @Column(name = "git_repository_url", length = 500)
+    private String gitRepositoryUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;

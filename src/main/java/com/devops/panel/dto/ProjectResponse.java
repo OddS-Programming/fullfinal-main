@@ -17,6 +17,7 @@ public class ProjectResponse {
     private String name;
     private String description;
     private boolean publicProject;
+    private String gitRepositoryUrl;
     private Long ownerId;
     private String ownerUsername;
     private Instant createdAt;

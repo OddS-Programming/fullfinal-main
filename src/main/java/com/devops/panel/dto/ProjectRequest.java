@@ -15,4 +15,7 @@ public class ProjectRequest {
     private String description;
 
     private Boolean publicProject;
+
+    @Size(max = 500)
+    private String gitRepositoryUrl;
 }
