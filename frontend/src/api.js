@@ -74,6 +74,11 @@ export async function getMyProjects(params = {}) {
   return api(`/projects/my${query ? `?${query}` : ''}`);
 }
 
+export async function getPublicProjects(params = {}) {
+  const query = new URLSearchParams(params).toString();
+  return api(`/projects/public${query ? `?${query}` : ''}`);
+}
+
 export async function getProject(id) {
   return api(`/projects/${id}`);
 }
@@ -81,14 +86,18 @@ export async function getProject(id) {
 export async function createProject(name, description) {
   return api('/projects', {
     method: 'POST',
-    body: JSON.stringify({ name, description: description || '' }),
+    body: JSON.stringify(name && typeof name === 'object'
+      ? name
+      : { name, description: description || '' }),
   });
 }
 
 export async function updateProject(id, name, description) {
   return api(`/projects/${id}`, {
     method: 'PUT',
-    body: JSON.stringify({ name, description: description || '' }),
+    body: JSON.stringify(name && typeof name === 'object'
+      ? name
+      : { name, description: description || '' }),
   });
 }
 
@@ -117,4 +126,25 @@ export async function createDeployment(projectId, payload) {
     method: 'POST',
     body: JSON.stringify(payload),
   });
+}
+
+export async function updateGitRepository(projectId, repositoryUrl) {
+  return api(`/projects/${projectId}/git/repository`, {
+    method: 'PUT',
+    body: JSON.stringify({ repositoryUrl }),
+  });
+}
+
+export async function getGitBranches(projectId) {
+  return api(`/projects/${projectId}/git/branches`);
+}
+
+export async function getGitCommits(projectId, params = {}) {
+  const query = new URLSearchParams(params).toString();
+  return api(`/projects/${projectId}/git/commits${query ? `?${query}` : ''}`);
+}
+
+export async function getGitWebhooks(projectId, params = {}) {
+  const query = new URLSearchParams(params).toString();
+  return api(`/projects/${projectId}/git/webhooks${query ? `?${query}` : ''}`);
 }

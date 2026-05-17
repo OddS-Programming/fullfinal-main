@@ -8,6 +8,8 @@ export default function ProjectForm() {
   const isEdit = Boolean(id);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [publicProject, setPublicProject] = useState(false);
+  const [gitRepositoryUrl, setGitRepositoryUrl] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(isEdit);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,6 +27,8 @@ export default function ProjectForm() {
         if (isActive) {
           setName(project.name);
           setDescription(project.description || '');
+          setPublicProject(Boolean(project.publicProject));
+          setGitRepositoryUrl(project.gitRepositoryUrl || '');
         }
       })
       .catch((err) => {
@@ -50,10 +54,10 @@ export default function ProjectForm() {
 
     try {
       if (isEdit) {
-        await updateProject(id, name, description);
+        await updateProject(id, { name, description, publicProject, gitRepositoryUrl });
         navigate(`/projects/${id}`);
       } else {
-        const created = await createProject(name, description);
+        const created = await createProject({ name, description, publicProject, gitRepositoryUrl });
         navigate(`/projects/${created.id}`);
       }
     } catch (err) {
@@ -102,6 +106,28 @@ export default function ProjectForm() {
                 placeholder="Что делает этот сервис и почему он важен?"
               />
             </div>
+
+            <div className="field">
+              <label htmlFor="project-git-url">Git repository URL</label>
+              <input
+                id="project-git-url"
+                type="url"
+                value={gitRepositoryUrl}
+                onChange={(event) => setGitRepositoryUrl(event.target.value)}
+                maxLength={500}
+                placeholder="https://github.com/user/repo.git"
+              />
+            </div>
+
+            <label className="field" htmlFor="project-public">
+              <span>Public project</span>
+              <input
+                id="project-public"
+                type="checkbox"
+                checked={publicProject}
+                onChange={(event) => setPublicProject(event.target.checked)}
+              />
+            </label>
 
             {error && <div className="error-banner">{error}</div>}
 

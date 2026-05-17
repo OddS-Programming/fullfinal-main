@@ -6,7 +6,11 @@ import {
   deleteProject,
   getDeployments,
   getEnvironments,
+  getGitBranches,
+  getGitCommits,
+  getGitWebhooks,
   getProject,
+  updateGitRepository,
 } from '../api';
 
 function formatDate(value) {
@@ -44,6 +48,11 @@ export default function ProjectDetail() {
   const [deploymentStatus, setDeploymentStatus] = useState('SUCCESS');
   const [selectedEnvironmentId, setSelectedEnvironmentId] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [gitRepositoryUrl, setGitRepositoryUrl] = useState('');
+  const [gitBranches, setGitBranches] = useState([]);
+  const [gitCommits, setGitCommits] = useState([]);
+  const [gitWebhooks, setGitWebhooks] = useState({ content: [] });
+  const [gitLoading, setGitLoading] = useState(false);
 
   const loadProjectData = async () => {
     setLoading(true);
@@ -57,13 +66,43 @@ export default function ProjectDetail() {
       ]);
 
       setProject(projectData);
+      setGitRepositoryUrl(projectData.gitRepositoryUrl || '');
       setEnvironments(environmentsData);
       setDeployments(deploymentsData);
+      await loadGitData(projectData.gitRepositoryUrl);
     } catch (err) {
       setError(err.message || 'Не удалось загрузить детали проекта');
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadGitData = async (repositoryUrl = gitRepositoryUrl) => {
+    setGitBranches([]);
+    setGitCommits([]);
+    setGitWebhooks({ content: [] });
+
+    if (!repositoryUrl) {
+      return;
+    }
+
+    setGitLoading(true);
+    const [branchesResult, commitsResult, webhooksResult] = await Promise.allSettled([
+      getGitBranches(id),
+      getGitCommits(id, { limit: 8 }),
+      getGitWebhooks(id, { size: 8 }),
+    ]);
+
+    if (branchesResult.status === 'fulfilled') {
+      setGitBranches(branchesResult.value);
+    }
+    if (commitsResult.status === 'fulfilled') {
+      setGitCommits(commitsResult.value);
+    }
+    if (webhooksResult.status === 'fulfilled') {
+      setGitWebhooks(webhooksResult.value);
+    }
+    setGitLoading(false);
   };
 
   useEffect(() => {
@@ -138,6 +177,22 @@ export default function ProjectDetail() {
     }
   };
 
+  const handleGitSubmit = async (event) => {
+    event.preventDefault();
+    setError('');
+    setSuccess('');
+
+    try {
+      const updated = await updateGitRepository(id, gitRepositoryUrl.trim());
+      setProject(updated);
+      setGitRepositoryUrl(updated.gitRepositoryUrl || '');
+      setSuccess('Git repository saved');
+      await loadGitData(updated.gitRepositoryUrl);
+    } catch (err) {
+      setError(err.message || 'Cannot save git repository');
+    }
+  };
+
   if (loading) {
     return (
       <div className="stack">
@@ -196,6 +251,69 @@ export default function ProjectDetail() {
             {latestDeployment ? latestDeployment.version : 'Нет данных'}
           </div>
         </article>
+      </section>
+
+      <section className="panel">
+        <div className="panel__header">
+          <div>
+            <div className="section-kicker">Git</div>
+            <h2 className="panel__title">Repository</h2>
+          </div>
+        </div>
+
+        <form className="form-grid" onSubmit={handleGitSubmit} style={{ marginTop: '1rem' }}>
+          <div className="field">
+            <label htmlFor="git-repository-url">Repository URL</label>
+            <input
+              id="git-repository-url"
+              type="url"
+              value={gitRepositoryUrl}
+              onChange={(event) => setGitRepositoryUrl(event.target.value)}
+              placeholder="https://github.com/user/repo.git"
+            />
+          </div>
+          <button type="submit" className="btn btn--secondary">Save Git</button>
+        </form>
+
+        {gitLoading && <div className="skeleton" style={{ marginTop: '1rem' }} />}
+
+        <div className="detail-grid" style={{ marginTop: '1rem' }}>
+          <div className="stack stack--sm">
+            <h3 className="panel__title">Branches</h3>
+            {gitBranches.length === 0 ? (
+              <div className="empty-state">No branches loaded</div>
+            ) : gitBranches.map((branch) => (
+              <div key={branch.name} className="list-card">
+                <strong>{branch.name}</strong>
+                <div className="muted">{branch.commitHash}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="stack stack--sm">
+            <h3 className="panel__title">Commits</h3>
+            {gitCommits.length === 0 ? (
+              <div className="empty-state">No commits loaded</div>
+            ) : gitCommits.map((commit) => (
+              <div key={commit.hash} className="list-card">
+                <strong>{commit.shortHash} {commit.message}</strong>
+                <div className="muted">{commit.authorName} - {formatDate(commit.committedAt)}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="stack stack--sm">
+            <h3 className="panel__title">Webhooks</h3>
+            {(gitWebhooks.content || []).length === 0 ? (
+              <div className="empty-state">No webhook events</div>
+            ) : gitWebhooks.content.map((event) => (
+              <div key={event.id} className="list-card">
+                <strong>{event.provider}: {event.eventType}</strong>
+                <div className="muted">{event.deliveryId || 'no delivery id'} - {formatDate(event.createdAt)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="panel-grid detail-grid">

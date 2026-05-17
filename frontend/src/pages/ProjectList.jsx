@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { getMyProjects, getProjects } from '../api';
+import { getMyProjects, getProjects, getPublicProjects } from '../api';
 
 function formatDate(value) {
   if (!value) {
@@ -25,7 +25,11 @@ export default function ProjectList({ user }) {
     setLoading(true);
     setError('');
 
-    const request = scope === 'all' ? getProjects : getMyProjects;
+    const request = scope === 'public'
+      ? getPublicProjects
+      : scope === 'all'
+        ? getProjects
+        : getMyProjects;
 
     request({ page, size: 6 })
       .then((data) => {
@@ -117,6 +121,29 @@ export default function ProjectList({ user }) {
           </div>
 
           <div className="toolbar">
+            <div className="scope-switch" role="tablist" aria-label="Project scope">
+              <button
+                type="button"
+                className={`scope-switch__button ${scope === 'mine' ? 'scope-switch__button--active' : ''}`}
+                onClick={() => {
+                  setPage(0);
+                  setScope('mine');
+                }}
+              >
+                Mine
+              </button>
+              <button
+                type="button"
+                className={`scope-switch__button ${scope === 'public' ? 'scope-switch__button--active' : ''}`}
+                onClick={() => {
+                  setPage(0);
+                  setScope('public');
+                }}
+              >
+                Public
+              </button>
+            </div>
+
             {isAdmin && (
               <div className="scope-switch" role="tablist" aria-label="Режим просмотра проектов">
                 <button
