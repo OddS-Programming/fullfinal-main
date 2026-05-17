@@ -3,10 +3,17 @@ package com.devops.panel.controller;
 import com.devops.panel.dto.GitBranchResponse;
 import com.devops.panel.dto.GitCommitResponse;
 import com.devops.panel.dto.GitRepositoryRequest;
+import com.devops.panel.dto.GitWebhookEventResponse;
 import com.devops.panel.dto.ProjectResponse;
 import com.devops.panel.service.GitIntegrationService;
+import com.devops.panel.service.GitWebhookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +28,7 @@ import java.util.List;
 public class GitIntegrationController {
 
     private final GitIntegrationService gitIntegrationService;
+    private final GitWebhookService gitWebhookService;
 
     @PutMapping("/repository")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
@@ -50,5 +58,24 @@ public class GitIntegrationController {
             @AuthenticationPrincipal UserDetails user
     ) {
         return ResponseEntity.ok(gitIntegrationService.getCommits(projectId, branch, limit, user.getUsername()));
+    }
+
+    @PostMapping("/webhooks")
+    public ResponseEntity<GitWebhookEventResponse> receiveWebhook(
+            @PathVariable Long projectId,
+            @RequestHeader HttpHeaders headers,
+            @RequestBody String payload
+    ) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(gitWebhookService.receive(projectId, headers, payload));
+    }
+
+    @GetMapping("/webhooks")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<Page<GitWebhookEventResponse>> getWebhooks(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal UserDetails user,
+            @PageableDefault(size = 20) Pageable pageable
+    ) {
+        return ResponseEntity.ok(gitWebhookService.findByProject(projectId, user.getUsername(), pageable));
     }
 }
