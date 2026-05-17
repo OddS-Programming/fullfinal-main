@@ -35,6 +35,15 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.findAll(name, pageable));
     }
 
+    @GetMapping("/public")
+    public ResponseEntity<Page<ProjectResponse>> getPublic(
+            @RequestParam(required = false) String name,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        log.debug("Fetching public projects page={}, size={}, filter={}", pageable.getPageNumber(), pageable.getPageSize(), name);
+        return ResponseEntity.ok(projectService.findPublic(name, pageable));
+    }
+
     @GetMapping("/my")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Page<ProjectResponse>> getMy(

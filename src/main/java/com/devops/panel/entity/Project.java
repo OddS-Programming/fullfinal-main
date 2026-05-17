@@ -28,6 +28,10 @@ public class Project {
     @Column(length = 1000)
     private String description;
 
+    @Column(name = "is_public", nullable = false)
+    @Builder.Default
+    private boolean publicProject = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;

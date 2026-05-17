@@ -41,6 +41,14 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
+    public Page<ProjectResponse> findPublic(String name, Pageable pageable) {
+        Page<Project> page = name != null && !name.isBlank()
+                ? projectRepository.findByPublicProjectTrueAndNameContainingIgnoreCase(name.trim(), pageable)
+                : projectRepository.findByPublicProjectTrue(pageable);
+        return page.map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
     public ProjectResponse getById(Long id) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + id));
@@ -57,6 +65,7 @@ public class ProjectService {
         Project project = Project.builder()
                 .name(request.getName())
                 .description(request.getDescription())
+                .publicProject(Boolean.TRUE.equals(request.getPublicProject()))
                 .owner(owner)
                 .build();
         project = projectRepository.save(project);
@@ -75,6 +84,7 @@ public class ProjectService {
         }
         project.setName(request.getName());
         project.setDescription(request.getDescription());
+        project.setPublicProject(Boolean.TRUE.equals(request.getPublicProject()));
         project = projectRepository.save(project);
         log.info("Project updated: id={}, name={}", project.getId(), project.getName());
         return toResponse(project);
@@ -98,6 +108,7 @@ public class ProjectService {
                 .id(p.getId())
                 .name(p.getName())
                 .description(p.getDescription())
+                .publicProject(p.isPublicProject())
                 .ownerId(p.getOwner().getId())
                 .ownerUsername(p.getOwner().getUsername())
                 .createdAt(p.getCreatedAt())

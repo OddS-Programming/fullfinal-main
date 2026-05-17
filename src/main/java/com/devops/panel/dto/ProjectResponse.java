@@ -16,6 +16,7 @@ public class ProjectResponse {
     private Long id;
     private String name;
     private String description;
+    private boolean publicProject;
     private Long ownerId;
     private String ownerUsername;
     private Instant createdAt;

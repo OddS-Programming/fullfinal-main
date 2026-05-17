@@ -13,5 +13,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Page<Project> findByOwnerId(Long ownerId, Pageable pageable);
 
+    Page<Project> findByPublicProjectTrue(Pageable pageable);
+
+    Page<Project> findByPublicProjectTrueAndNameContainingIgnoreCase(String name, Pageable pageable);
+
     boolean existsByNameAndOwnerId(String name, Long ownerId);
 }

@@ -13,4 +13,6 @@ public class ProjectRequest {
 
     @Size(max = 1000)
     private String description;
+
+    private Boolean publicProject;
 }
