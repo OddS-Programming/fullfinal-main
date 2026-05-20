@@ -42,12 +42,12 @@ npm.cmd run dev
 
 После Docker-запуска backend доступен по адресу:
 
-- `http://localhost:8080`
+- `http://localhost:8081`
 
 Проверка API без авторизации:
 
 ```bash
-curl http://localhost:8080/api/projects
+curl http://localhost:8081/api/projects
 ```
 
 Ответ `401` или `403` без токена здесь нормален.
@@ -77,17 +77,8 @@ Seed admin создаётся автоматически:
 
 - Java 17
 - Maven
-- PostgreSQL
 
-Параметры БД по умолчанию:
-
-| Variable | Value |
-| --- | --- |
-| `DB_HOST` | `localhost` |
-| `DB_PORT` | `5432` |
-| `DB_NAME` | `devops_panel` |
-| `DB_USER` | `postgres` |
-| `DB_PASSWORD` | `postgres` |
+По умолчанию используется in-memory H2 база данных, поэтому PostgreSQL локально не требуется.
 
 Запуск:
 
@@ -95,12 +86,11 @@ Seed admin создаётся автоматически:
 mvn spring-boot:run
 ```
 
-Если БД нестандартная, можно задать переменные в PowerShell:
+Если вы хотите использовать PostgreSQL, задайте переменные окружения, например:
 
 ```powershell
-$env:DB_HOST="localhost"
-$env:DB_PORT="5432"
-$env:DB_NAME="devops_panel"
+$env:DB_URL="jdbc:postgresql://localhost:5432/devops_panel"
+$env:DB_DRIVER="org.postgresql.Driver"
 $env:DB_USER="postgres"
 $env:DB_PASSWORD="postgres"
 mvn spring-boot:run

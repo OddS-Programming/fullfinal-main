@@ -24,14 +24,13 @@ services:
       dockerfile: Dockerfile
     container_name: devops-panel-app
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: devops_panel
+      DB_URL: jdbc:postgresql://postgres:5432/devops_panel
+      DB_DRIVER: org.postgresql.Driver
       DB_USER: postgres
       DB_PASSWORD: postgres
       JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       postgres:
         condition: service_healthy

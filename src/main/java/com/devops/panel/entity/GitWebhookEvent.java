@@ -31,8 +31,7 @@ public class GitWebhookEvent {
     @Column(length = 200)
     private String deliveryId;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "text")
     private String payload;
 
     @Column(nullable = false, updatable = false)

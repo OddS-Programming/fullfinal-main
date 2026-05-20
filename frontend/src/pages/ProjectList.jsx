@@ -121,28 +121,7 @@ export default function ProjectList({ user }) {
           </div>
 
           <div className="toolbar">
-            <div className="scope-switch" role="tablist" aria-label="Project scope">
-              <button
-                type="button"
-                className={`scope-switch__button ${scope === 'mine' ? 'scope-switch__button--active' : ''}`}
-                onClick={() => {
-                  setPage(0);
-                  setScope('mine');
-                }}
-              >
-                Mine
-              </button>
-              <button
-                type="button"
-                className={`scope-switch__button ${scope === 'public' ? 'scope-switch__button--active' : ''}`}
-                onClick={() => {
-                  setPage(0);
-                  setScope('public');
-                }}
-              >
-                Public
-              </button>
-            </div>
+
 
             {isAdmin && (
               <div className="scope-switch" role="tablist" aria-label="Режим просмотра проектов">

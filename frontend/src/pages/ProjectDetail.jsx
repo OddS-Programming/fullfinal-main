@@ -69,7 +69,9 @@ export default function ProjectDetail() {
       setGitRepositoryUrl(projectData.gitRepositoryUrl || '');
       setEnvironments(environmentsData);
       setDeployments(deploymentsData);
-      await loadGitData(projectData.gitRepositoryUrl);
+      
+      // Load git data in background so it doesn't block main page rendering
+      loadGitData(projectData.gitRepositoryUrl).catch(console.error);
     } catch (err) {
       setError(err.message || 'Не удалось загрузить детали проекта');
     } finally {
@@ -373,7 +375,6 @@ export default function ProjectDetail() {
                 value={environmentDescription}
                 onChange={(event) => setEnvironmentDescription(event.target.value)}
                 maxLength={1000}
-                placeholder="Например: основной production-контур для клиентов"
               />
             </div>
 
@@ -452,7 +453,6 @@ export default function ProjectDetail() {
                 value={deploymentDescription}
                 onChange={(event) => setDeploymentDescription(event.target.value)}
                 maxLength={1000}
-                placeholder="Например: выкатка hotfix после исправления авторизации"
               />
             </div>
 

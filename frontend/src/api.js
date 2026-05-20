@@ -39,6 +39,12 @@ export async function api(url, options = {}) {
   const data = isJson ? await response.json().catch(() => ({})) : null;
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      clearAuth();
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        window.location.href = '/login';
+      }
+    }
     const error = new Error(
       data?.message || data?.error || `Запрос завершился с ошибкой ${response.status}`,
     );
