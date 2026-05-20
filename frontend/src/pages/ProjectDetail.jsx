@@ -17,6 +17,10 @@ function formatDate(value) {
   return value ? new Date(value).toLocaleString() : 'Нет даты';
 }
 
+function formatDateOnly(value) {
+  return value ? new Date(value).toLocaleDateString() : 'Нет даты';
+}
+
 function statusClassName(status) {
   const normalized = (status || '').toLowerCase();
 
@@ -299,7 +303,7 @@ export default function ProjectDetail() {
             ) : gitCommits.map((commit) => (
               <div key={commit.hash} className="list-card">
                 <strong>{commit.shortHash} {commit.message}</strong>
-                <div className="muted">{commit.authorName} - {formatDate(commit.committedAt)}</div>
+                <div className="muted">{commit.authorName} - {formatDateOnly(commit.committedAt)}</div>
               </div>
             ))}
           </div>
@@ -331,7 +335,6 @@ export default function ProjectDetail() {
             {environments.length === 0 ? (
               <div className="empty-state">
                 <h3>Окружений пока нет</h3>
-                <p className="muted">Создайте хотя бы одно окружение перед добавлением деплоев.</p>
               </div>
             ) : (
               environments.map((environment) => (
@@ -396,7 +399,6 @@ export default function ProjectDetail() {
             {(deployments.content || []).length === 0 ? (
               <div className="empty-state">
                 <h3>Деплоев пока нет</h3>
-                <p className="muted">Создайте запись о деплое, чтобы проверить вложенные REST endpoint.</p>
               </div>
             ) : (
               (deployments.content || []).map((deployment) => (
